@@ -1,0 +1,178 @@
+1. strcpy
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10];
+    char input[50] = "This input is way too long!";
+    
+    strcpy(buffer, input);  // Vulnerable: input size is not checked
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10];
+    char input[50] = "This input is way too long!";
+    
+    strncpy(buffer, input, sizeof(buffer) - 1);  // Safe: limits copied bytes to buffer size - 1
+    buffer[9] = '\0';  // Ensures null-termination
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+2. sprintf
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    int num = 123456789;
+    
+    sprintf(buffer, "Number: %d", num);  // Vulnerable: formatted string may exceed buffer size
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    int num = 123456789;
+    
+    snprintf(buffer, sizeof(buffer), "Number: %d", num);  // Safe: limits formatted string size
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+3. gets
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    
+    gets(buffer);  // Vulnerable: no size limit, input could overflow buffer
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    
+    fgets(buffer, sizeof(buffer), stdin);  // Safe: limits input size to buffer size
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+4. scanf
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    
+    scanf("%s", buffer);  // Vulnerable: no size limit, can overflow if input is too long
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+
+int main() {
+    char buffer[10];
+    
+    scanf("%9s", buffer);  // Safe: limits input to 9 characters, leaving room for null terminator
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+5. strcat
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10] = "Hello";
+    char input[50] = "World";
+    
+    strcat(buffer, input);  // Vulnerable: buffer may overflow if concatenated string is too large
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10] = "Hello";
+    char input[50] = "World";
+    
+    strncat(buffer, input, sizeof(buffer) - strlen(buffer) - 1);  // Safe: limits concatenation size
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+6. memcpy
+Vulnerable Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10];
+    char input[50] = "This is a long string.";
+    
+    memcpy(buffer, input, 50);  // Vulnerable: attempts to copy 50 bytes into a 10-byte buffer
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
+Rectified Code:
+c
+Copy code
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char buffer[10];
+    char input[50] = "This is a long string.";
+    
+    memcpy(buffer, input, sizeof(buffer) - 1);  // Safe: only copies up to buffer size - 1
+    buffer[9] = '\0';  // Ensure null-termination
+    printf("Buffer content: %s\n", buffer);
+    
+    return 0;
+}
